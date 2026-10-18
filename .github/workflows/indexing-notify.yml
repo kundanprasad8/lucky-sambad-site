@@ -1,4 +1,5 @@
 name: Indexing API notify
+run-name: "indexing ${{ inputs.batch }}"
 
 # Relay: this repo's Actions runner has open egress to Google APIs, which the
 # lottery build server lacks. The build server triggers this workflow via
@@ -13,6 +14,11 @@ on:
       urls:
         description: 'Comma-separated URLs to notify as URL_UPDATED (max ~50)'
         required: true
+        type: string
+      batch:
+        description: 'Batch label for tracking (optional)'
+        required: false
+        default: ''
         type: string
 
 jobs:
