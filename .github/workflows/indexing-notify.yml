@@ -1,0 +1,30 @@
+name: Indexing API notify
+
+# Relay: this repo's Actions runner has open egress to Google APIs, which the
+# lottery build server lacks. The build server triggers this workflow via
+# workflow_dispatch after each site push, passing the changed URLs.
+# Added 2026-10-18. Honest scope note: Google's Indexing API officially
+# supports only JobPosting / BroadcastEvent(livestream) pages; notifications
+# for ordinary pages are accepted but ignored for crawl scheduling.
+
+on:
+  workflow_dispatch:
+    inputs:
+      urls:
+        description: 'Comma-separated URLs to notify as URL_UPDATED (max ~50)'
+        required: true
+        type: string
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Send URL_UPDATED notifications
+        env:
+          SA_KEY_JSON: ${{ secrets.INDEXING_SA_KEY }}
+          URLS: ${{ inputs.urls }}
+        run: |
+          pip install -q google-auth requests
+          python3 .github/workflows/indexing_notify.py
